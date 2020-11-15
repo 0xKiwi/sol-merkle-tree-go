@@ -5,13 +5,12 @@ This is a simple merkle tree implementation in go for use within solidity. This 
 ## Usage
 ```golang
 import (
-	"encoding/binary"
 	"fmt"
 	"math/big"
 
-	solsha3 "github.com/miguelmota/go-solidity-sha3"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/0xKiwi/sol-merkle-tree-go"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 type User struct {
@@ -38,42 +37,39 @@ func createDistributionTree(holderArray []*tokenHolder) (map[string]ClaimInfo, e
 	}
 
     // Solidity hash the data to use as tree leaves. 
-    nodes := make([][]byte, len(elements))
-    for i, user := range elements {
-        hash := solsha3.SoliditySHA3(
-            // Types.
-            []string{"uint256", "address", "uint256"},
-    
-            // Values.
-            []interface{}{
-                fmt.Sprintf("%d", user.index),
-                user.account.String(),
-                user.amount.String(),
-            },
-        )
-        nodes[i] = hash
-    }
-    
-    // Create the tree.
-    tree, err := solmerkle.GenerateTreeFromItems(nodes)
-    if err != nil {
-        return nil, fmt.Errorf("could not generate trie: %v", err)
-    }
-    distributionRoot := tree.Root()
-    
-    // Map claim data to user address, with the merkle proof for claiming from MerkleDistributor. 
-    addrToProof := make(map[string]ClaimInfo, len(holderArray))
-    for i, holder := range holderArray {
-        proof, err := tree.MerkleProof(nodes[i])
-        if err != nil {
-            return nil, fmt.Errorf("could not generate proof: %v", err)
-        }
-        addrToProof[holder.addr.String()] = ClaimInfo{
-            Index:  uint64(i),
-            Amount: holder.balance.String(),
-            Proof:  stringArrayFrom2DBytes(proof),
-        }
-    }
-    return addrToProof
+nodes := make([][]byte, len(elements))
+	for i, user := range elements {
+		packed := append(
+			uint64To256BytesLittleEndian(user.index),
+			append(
+				user.account.Bytes(),
+				common.LeftPadBytes(user.amount.Bytes(), 32)...,
+			)...,
+		)
+		nodes[i] = crypto.Keccak256(packed)
+	}
+
+    // Create the tree. 
+	tree, err := solmerkle.GenerateTreeFromHashedItems(nodes)
+	if err != nil {
+		return nil, fmt.Errorf("could not generate trie: %v", err)
+	}
+	distributionRoot := tree.Root()
+
+    // Place info for claiming into a map. 
+	addrToProof := make(map[string]ClaimInfo, len(holderArray))
+	for i, holder := range holderArray {
+		proof, err := tree.MerkleProof(nodes[i])
+		if err != nil {
+			return nil, fmt.Errorf("could not generate proof: %v", err)
+		}
+		addrToProof[holder.addr.String()] = ClaimInfo{
+			Index:  uint64(i),
+			Amount: holder.balance.String(),
+			Proof:  stringArrayFrom2DBytes(proof),
+		}
+	}
+	addrToProof["root"] = ClaimInfo{Amount: fmt.Sprintf("%#x", distributionRoot)}
+	return addrToProof, nil
 }
 ```
