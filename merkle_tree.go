@@ -7,7 +7,7 @@ import (
 	"math"
 	"sort"
 
-	solsha3 "github.com/miguelmota/go-solidity-sha3"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 // MerkleTree implements a general purpose Merkle tree.
@@ -16,16 +16,23 @@ type MerkleTree struct {
 	depth    uint64
 }
 
-// GenerateTreeFromItems constructs a Merkle tree from a sequence of byte slices.
 func GenerateTreeFromItems(items [][]byte) (*MerkleTree, error) {
-	if len(items) == 0 {
-		return nil, errors.New("no items provided to generate Merkle tree")
-	}
 	// Pad all items to 32 bytes.
 	leaves := copy2dBytes(items)
 	for i := range leaves {
-		leaves[i] = padTo(leaves[i], 32)
+		leaves[i] = hash(padTo(leaves[i], 32))
 	}
+	return GenerateTreeFromHashedItems(leaves)
+}
+
+// GenerateTreeFromItems constructs a Merkle tree from a sequence of byte slices.
+func GenerateTreeFromHashedItems(items [][]byte) (*MerkleTree, error) {
+	if len(items) == 0 {
+		return nil, errors.New("no items provided to generate Merkle tree")
+	}
+	// Clone the slice to prevent mutation.
+	leaves := copy2dBytes(items)
+
 	// Sort by byte contents.
 	sort.Slice(leaves, func(i, j int) bool {
 		return lessThanBytes(leaves[i], leaves[j])
@@ -134,17 +141,5 @@ func SortAndHash(i []byte, j []byte) []byte {
 }
 
 func hash(data ...[]byte) []byte {
-	types := make([]string, len(data))
-	for i := 0; i < len(types); i++ {
-		types[i] = "bytes32"
-	}
-	values := make([]interface{}, len(data))
-	for i := 0; i < len(data); i++ {
-		values[i] = solsha3.Bytes32(data[i])
-	}
-	hash := solsha3.SoliditySHA3(
-		types,
-		values,
-	)
-	return hash
+	return crypto.Keccak256(data...)
 }

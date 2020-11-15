@@ -22,7 +22,7 @@ func TestGenerateTrieFromItems(t *testing.T) {
 				padTo([]byte{3}, 32),
 				padTo([]byte{4}, 32),
 			},
-			wantRoot: common.Hex2Bytes("b7427f9168772043b1b25f80c3c6ba6f786ee3b3c3cc6f7721d40e1f57e263e1"),
+			wantRoot: common.Hex2Bytes("2e062ab1c855bfc38612bab4c636b67b9f466a193f23f6867cc19d259c0dc334"),
 		},
 		{
 			name: "larger not sorted",
@@ -36,7 +36,7 @@ func TestGenerateTrieFromItems(t *testing.T) {
 				padTo([]byte{12}, 32),
 				padTo([]byte{8}, 32),
 			},
-			wantRoot: common.Hex2Bytes("1286aba3bcf9de47484160acc9302c836c642443fe27fa871b41ee47b0ceaed0"),
+			wantRoot: common.Hex2Bytes("f0d2633b9a01765034e5ab2bb86950d4f961ea2f31038795e27954cd26f978ce"),
 		},
 		{
 			name: "larger and uneven",
@@ -51,7 +51,7 @@ func TestGenerateTrieFromItems(t *testing.T) {
 				padTo([]byte{8}, 32),
 				padTo([]byte{11}, 32),
 			},
-			wantRoot: common.Hex2Bytes("f3300366f2b43137eacdfedfe2bc110fdb488d6f01289309c087ace971691747"),
+			wantRoot: common.Hex2Bytes("af6c5f75b9a0d2264bd267446c83b59e0d10df482f1f8d58339f6b1a7a681ae6"),
 		},
 		{
 			name: "very large and uneven",
@@ -80,7 +80,7 @@ func TestGenerateTrieFromItems(t *testing.T) {
 				padTo([]byte{70}, 32),
 				padTo([]byte{60}, 32),
 			},
-			wantRoot: common.Hex2Bytes("2e2e5a66fe23ffc25107cfccb3b46ab38a5d0952c6d34d4fa114659259bf9342"),
+			wantRoot: common.Hex2Bytes("c0ac0b29e2449bbf0939a318fe2898d1158774adacc293198ae706d4bf128adf"),
 		},
 	}
 	for _, tt := range tests {
@@ -89,6 +89,15 @@ func TestGenerateTrieFromItems(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GenerateTreeFromItems() error = %v, wantErr %v", err, tt.wantErr)
 				return
+			}
+			if got == nil {
+				t.Fatal("got == nil")
+			}
+
+			for i := 0; i < len(got.branches); i++ {
+				for j := 0; j < len(got.branches[i]); j++ {
+					t.Logf("%#x", got.branches[i][j])
+				}
 			}
 
 			root := got.Root()
@@ -119,11 +128,11 @@ func TestMerkleProof(t *testing.T) {
 				padTo([]byte{12}, 32),
 				padTo([]byte{8}, 32),
 			},
-			itemToProve: common.Hex2Bytes("0c00000000000000000000000000000000000000000000000000000000000000"),
+			itemToProve: common.Hex2Bytes("5723d2c3a83af9b735e3b7f21531e5623d183a9095a56604ead41f3582fdfb75"),
 			wantProof: [][]byte{
-				common.Hex2Bytes("1000000000000000000000000000000000000000000000000000000000000000"),
-				common.Hex2Bytes("bb8672753809914c7d415f12b6dec37fa42357bd158e5a5a0106209f8fdeec75"),
-				common.Hex2Bytes("b7427f9168772043b1b25f80c3c6ba6f786ee3b3c3cc6f7721d40e1f57e263e1"),
+				common.Hex2Bytes("cc969683f9149b325f7a900071a421ed89ed4dbc0c9dab44480d32b66ed29088"),
+				common.Hex2Bytes("652bdb6779269ffd9606323a76cfc930027ec1f9af31f581f02973476412ccbd"),
+				common.Hex2Bytes("6b627580b5cb9c5f0e6491994f2dc4859ac6eba43449055c53861c6fd05148cd"),
 			},
 		},
 		{
@@ -139,12 +148,12 @@ func TestMerkleProof(t *testing.T) {
 				padTo([]byte{8}, 32),
 				padTo([]byte{11}, 32),
 			},
-			itemToProve: common.Hex2Bytes("1000000000000000000000000000000000000000000000000000000000000000"),
+			itemToProve: common.Hex2Bytes("cc969683f9149b325f7a900071a421ed89ed4dbc0c9dab44480d32b66ed29088"),
 			wantProof: [][]byte{
-				common.Hex2Bytes("1000000000000000000000000000000000000000000000000000000000000000"),
-				common.Hex2Bytes("1a1a55287a82e584e7138c0acd6666344f17ad0c52b3618a34a57ac52a0373ac"),
-				common.Hex2Bytes("ccd639cabcb0ffcefeacfacbeb11c70615783a025bfe944b97b77fb2b16ebf3d"),
-				common.Hex2Bytes("c6e56afe1fd6fb6a0de84acaafa6a051552413e6eaef27d539414dc679dc9e36"),
+				common.Hex2Bytes("cc969683f9149b325f7a900071a421ed89ed4dbc0c9dab44480d32b66ed29088"),
+				common.Hex2Bytes("339ce64dfea64e35185aa30ebe0bd14ea07c03877ad17ecc51fc8ca8b098e7b2"),
+				common.Hex2Bytes("c87adecd2ddb1e3378f0a6b069f7fb78afc05272f6f00decb90edfb3fbc51e2c"),
+				common.Hex2Bytes("1772386e105fd8dd137d69e14d9c6620aebcae51f50eabd046d0222749755fa0"),
 			},
 		},
 		{
@@ -174,13 +183,13 @@ func TestMerkleProof(t *testing.T) {
 				padTo([]byte{70}, 32),
 				padTo([]byte{60}, 32),
 			},
-			itemToProve: common.Hex2Bytes("2000000000000000000000000000000000000000000000000000000000000000"),
+			itemToProve: common.Hex2Bytes("382e3c198d933f7462412341b2cc6d0b12215af5adc803ad40dfe5f44a444e0f"),
 			wantProof: [][]byte{
-				common.Hex2Bytes("1400000000000000000000000000000000000000000000000000000000000000"),
-				common.Hex2Bytes("035929d7fc4417a9f309425389eaed8b13b3e45e364ecea9863d9b4dd69b1a79"),
-				common.Hex2Bytes("9c76fa755893aafed6983821b97ba09e7b2180c2eaefcb39b03a71ee08a51d00"),
-				common.Hex2Bytes("293b57ac9721cd60fbb5606a4820161ff613b935bfd39153daf3342fc996a3ed"),
-				common.Hex2Bytes("ad4641b0d346289fc71b0486c85079e5bd2452a189aff08a06761c24cd68ea7b"),
+				common.Hex2Bytes("382e3c198d933f7462412341b2cc6d0b12215af5adc803ad40dfe5f44a444e0f"),
+				common.Hex2Bytes("e23fa5d990f321d8be1a5aaa34ec48f8248f0f416f4fd05cead2cf0a15007eaf"),
+				common.Hex2Bytes("16068cdc834c589e6dfc5757417bd41ee47ede31e5e58f548ddbf936d0789578"),
+				common.Hex2Bytes("dd5c06296f49e41babc319f48a17778b5f33ef5e9b6750e4cc53ccd0e7b18723"),
+				common.Hex2Bytes("1d87197e80d62f8af995d1a8df69efa3996dac57e16757452997f615c0bdcc68"),
 			},
 		},
 	}
@@ -215,47 +224,47 @@ func TestVerifyMerkleBranch(t *testing.T) {
 	}{
 		{
 			name: "simple",
-			root: common.Hex2Bytes("b7427f9168772043b1b25f80c3c6ba6f786ee3b3c3cc6f7721d40e1f57e263e1"),
-			item: common.Hex2Bytes("0200000000000000000000000000000000000000000000000000000000000000"),
+			root: common.Hex2Bytes("2e062ab1c855bfc38612bab4c636b67b9f466a193f23f6867cc19d259c0dc334"),
+			item: common.Hex2Bytes("426fcb404ab2d5d8e61a3d918108006bbb0a9be65e92235bb10eefbdb6dcd053"),
 			proof: [][]byte{
-				common.Hex2Bytes("0100000000000000000000000000000000000000000000000000000000000000"),
-				common.Hex2Bytes("a72ed8e5e3171a48b8d1faef1360d4456831f9438307e777fa6110e1d6599ecd"),
+				common.Hex2Bytes("340dd630ad21bf010b4e676dbfa9ba9a02175262d1fa356232cfde6cb5b47ef2"),
+				common.Hex2Bytes("b103de8b3738dd100e9b4f9f5f4ce4ae7336d31f2c08892a4b5950926ef0829f"),
 			},
 			success: true,
 		},
 		{
 			name: "larger",
-			root: common.Hex2Bytes("1286aba3bcf9de47484160acc9302c836c642443fe27fa871b41ee47b0ceaed0"),
-			item: common.Hex2Bytes("0c00000000000000000000000000000000000000000000000000000000000000"),
+			root: common.Hex2Bytes("f0d2633b9a01765034e5ab2bb86950d4f961ea2f31038795e27954cd26f978ce"),
+			item: common.Hex2Bytes("0c2d1b9c97b15f8a18e224fe94a8453f996465e14217e0939995ce76fbe01129"),
 			proof: [][]byte{
-				common.Hex2Bytes("1000000000000000000000000000000000000000000000000000000000000000"),
-				common.Hex2Bytes("bb8672753809914c7d415f12b6dec37fa42357bd158e5a5a0106209f8fdeec75"),
-				common.Hex2Bytes("b7427f9168772043b1b25f80c3c6ba6f786ee3b3c3cc6f7721d40e1f57e263e1"),
+				common.Hex2Bytes("0bab70cb415fad57bb66ddb2bfe7e36342284737c8f13d1e6d19f65a726e6fb6"),
+				common.Hex2Bytes("abd2e5177fc65d948cb578e48cc6e3518a5252f5ea7dbd0a72e7d6b7c5e46442"),
+				common.Hex2Bytes("79cbd20f1282354329b4882ce93016ea6fe3a61531551d8e959912ee400ecdef"),
 			},
 			success: true,
 		},
 		{
 			name: "larger and uneven",
-			root: common.Hex2Bytes("f3300366f2b43137eacdfedfe2bc110fdb488d6f01289309c087ace971691747"),
-			item: common.Hex2Bytes("1000000000000000000000000000000000000000000000000000000000000000"),
+			root: common.Hex2Bytes("af6c5f75b9a0d2264bd267446c83b59e0d10df482f1f8d58339f6b1a7a681ae6"),
+			item: common.Hex2Bytes("cc969683f9149b325f7a900071a421ed89ed4dbc0c9dab44480d32b66ed29088"),
 			proof: [][]byte{
-				common.Hex2Bytes("1000000000000000000000000000000000000000000000000000000000000000"),
-				common.Hex2Bytes("1a1a55287a82e584e7138c0acd6666344f17ad0c52b3618a34a57ac52a0373ac"),
-				common.Hex2Bytes("ccd639cabcb0ffcefeacfacbeb11c70615783a025bfe944b97b77fb2b16ebf3d"),
-				common.Hex2Bytes("c6e56afe1fd6fb6a0de84acaafa6a051552413e6eaef27d539414dc679dc9e36"),
+				common.Hex2Bytes("cc969683f9149b325f7a900071a421ed89ed4dbc0c9dab44480d32b66ed29088"),
+				common.Hex2Bytes("339ce64dfea64e35185aa30ebe0bd14ea07c03877ad17ecc51fc8ca8b098e7b2"),
+				common.Hex2Bytes("c87adecd2ddb1e3378f0a6b069f7fb78afc05272f6f00decb90edfb3fbc51e2c"),
+				common.Hex2Bytes("1772386e105fd8dd137d69e14d9c6620aebcae51f50eabd046d0222749755fa0"),
 			},
 			success: true,
 		},
 		{
 			name: "very large and uneven",
-			root: common.Hex2Bytes("2e2e5a66fe23ffc25107cfccb3b46ab38a5d0952c6d34d4fa114659259bf9342"),
-			item: common.Hex2Bytes("2000000000000000000000000000000000000000000000000000000000000000"),
+			root: common.Hex2Bytes("c0ac0b29e2449bbf0939a318fe2898d1158774adacc293198ae706d4bf128adf"),
+			item: common.Hex2Bytes("382e3c198d933f7462412341b2cc6d0b12215af5adc803ad40dfe5f44a444e0f"),
 			proof: [][]byte{
-				common.Hex2Bytes("1400000000000000000000000000000000000000000000000000000000000000"),
-				common.Hex2Bytes("035929d7fc4417a9f309425389eaed8b13b3e45e364ecea9863d9b4dd69b1a79"),
-				common.Hex2Bytes("9c76fa755893aafed6983821b97ba09e7b2180c2eaefcb39b03a71ee08a51d00"),
-				common.Hex2Bytes("293b57ac9721cd60fbb5606a4820161ff613b935bfd39153daf3342fc996a3ed"),
-				common.Hex2Bytes("ad4641b0d346289fc71b0486c85079e5bd2452a189aff08a06761c24cd68ea7b"),
+				common.Hex2Bytes("382e3c198d933f7462412341b2cc6d0b12215af5adc803ad40dfe5f44a444e0f"),
+				common.Hex2Bytes("e23fa5d990f321d8be1a5aaa34ec48f8248f0f416f4fd05cead2cf0a15007eaf"),
+				common.Hex2Bytes("16068cdc834c589e6dfc5757417bd41ee47ede31e5e58f548ddbf936d0789578"),
+				common.Hex2Bytes("dd5c06296f49e41babc319f48a17778b5f33ef5e9b6750e4cc53ccd0e7b18723"),
+				common.Hex2Bytes("1d87197e80d62f8af995d1a8df69efa3996dac57e16757452997f615c0bdcc68"),
 			},
 			success: true,
 		},
