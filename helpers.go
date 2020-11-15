@@ -17,9 +17,9 @@ func Sort2Bytes(i []byte, j []byte) ([]byte, []byte) {
 
 func lessThanBytes(i []byte, j []byte) bool {
 	switch bytes.Compare(i, j) {
-	case -1:
+	case -1, 0:
 		return true
-	case 0, 1:
+	case 1:
 		return false
 	default:
 		return false
