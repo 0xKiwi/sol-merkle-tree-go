@@ -6,7 +6,8 @@ import (
 
 // Byte helpers.
 
-func sort2Bytes(i []byte, j []byte) ([]byte, []byte) {
+// Sorts2Bytes by contents.
+func Sort2Bytes(i []byte, j []byte) ([]byte, []byte) {
 	if lessThanBytes(i, j) {
 		return i, j
 	} else {
@@ -43,6 +44,7 @@ func padTo(b []byte, size int) []byte {
 
 // Math helpers.
 
+// Find the next power of 2 unless n is already a power of 2.
 func nextPowerOf2(n uint64) uint64 {
 	var count uint64 = 0
 

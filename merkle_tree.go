@@ -48,7 +48,7 @@ func GenerateTreeFromItems(items [][]byte) (*MerkleTree, error) {
 	for i := uint64(0); i < depth; i++ {
 		var updatedValues [][]byte
 		for j := 0; j < len(layers[i]); j += 2 {
-			concat := sortAndHash(layers[i][j], layers[i][j+1])
+			concat := SortAndHash(layers[i][j], layers[i][j+1])
 			updatedValues = append(updatedValues, concat[:])
 		}
 		layers[i+1] = updatedValues
@@ -124,11 +124,12 @@ func leafPair(leaves [][]byte, leaf []byte) ([]byte, []byte) {
 		otherLeaf = safeCopyBytes(leaves[indexOfLeaf-1])
 	}
 
-	return sort2Bytes(leaf, otherLeaf)
+	return Sort2Bytes(leaf, otherLeaf)
 }
 
-func sortAndHash(i []byte, j []byte) []byte {
-	sorted1, sorted2 := sort2Bytes(i, j)
+// SortAndHash sorts the 2 bytes and keccak256 hashes them.
+func SortAndHash(i []byte, j []byte) []byte {
+	sorted1, sorted2 := Sort2Bytes(i, j)
 	return hash(sorted1, sorted2)
 }
 
