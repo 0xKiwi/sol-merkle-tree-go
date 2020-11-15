@@ -9,10 +9,10 @@ import (
 
 func TestGenerateTrieFromItems(t *testing.T) {
 	tests := []struct {
-		name    string
+		name     string
 		items    [][]byte
-		wantRoot    []byte
-		wantErr bool
+		wantRoot []byte
+		wantErr  bool
 	}{
 		{
 			name: "simple sorted",
@@ -105,11 +105,11 @@ func TestGenerateTrieFromItems(t *testing.T) {
 
 func TestMerkleProof(t *testing.T) {
 	tests := []struct {
-		name    string
-		items    [][]byte
+		name        string
+		items       [][]byte
 		itemToProve []byte
-		wantProof    [][]byte
-		wantErr bool
+		wantProof   [][]byte
+		wantErr     bool
 	}{
 		{
 			name: "larger not sorted",
@@ -214,7 +214,7 @@ func TestVerifyMerkleBranch(t *testing.T) {
 		name    string
 		root    []byte
 		item    []byte
-		proof    [][]byte
+		proof   [][]byte
 		success bool
 	}{
 		{

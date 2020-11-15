@@ -7,13 +7,13 @@ import (
 	"math"
 	"sort"
 
-	"github.com/ethereum/go-ethereum/crypto"
+	"golang.org/x/crypto/sha3"
 )
 
 // MerkleTree implements a general purpose Merkle tree.
 type MerkleTree struct {
 	branches [][][]byte
-	depth uint64
+	depth    uint64
 }
 
 // GenerateTreeFromItems constructs a Merkle tree from a sequence of byte slices.
@@ -33,7 +33,7 @@ func GenerateTreeFromItems(items [][]byte) (*MerkleTree, error) {
 
 	// Even out if uneven.
 	if len(leaves)%2 == 1 {
-		duplicate := safeCopyBytes(leaves[len(leaves) - 1])
+		duplicate := safeCopyBytes(leaves[len(leaves)-1])
 		leaves = append(leaves, duplicate)
 	}
 	// Append duplicate nodes until even.
@@ -42,7 +42,7 @@ func GenerateTreeFromItems(items [][]byte) (*MerkleTree, error) {
 		leaves = append(leaves, leaves[len(leaves)-2], leaves[len(leaves)-1])
 	}
 
-	depth := uint64(math.Log2(float64(len(leaves))+1))
+	depth := uint64(math.Log2(float64(len(leaves)) + 1))
 	layers := make([][][]byte, depth+1)
 	layers[0] = leaves
 	for i := uint64(0); i < depth; i++ {
@@ -56,7 +56,7 @@ func GenerateTreeFromItems(items [][]byte) (*MerkleTree, error) {
 
 	return &MerkleTree{
 		branches: layers,
-		depth: depth,
+		depth:    depth,
 	}, nil
 }
 
@@ -86,7 +86,7 @@ func (m *MerkleTree) MerkleProof(leaf []byte) ([][]byte, error) {
 	return proof, nil
 }
 
-func (m *MerkleTree) MerkleProofOfIndex(indexOfLeaf uint64) ([][]byte, error){
+func (m *MerkleTree) MerkleProofOfIndex(indexOfLeaf uint64) ([][]byte, error) {
 	if int(indexOfLeaf) > len(m.branches[0]) {
 		return nil, fmt.Errorf("could not find index %d, greater than length %d", indexOfLeaf, m.branches[0])
 	}
@@ -119,9 +119,9 @@ func leafPair(leaves [][]byte, leaf []byte) ([]byte, []byte) {
 	var otherLeaf []byte
 	left := indexOfLeaf%2 == 0
 	if left {
-		otherLeaf = safeCopyBytes(leaves[indexOfLeaf + 1])
+		otherLeaf = safeCopyBytes(leaves[indexOfLeaf+1])
 	} else {
-		otherLeaf = safeCopyBytes(leaves[indexOfLeaf - 1])
+		otherLeaf = safeCopyBytes(leaves[indexOfLeaf-1])
 	}
 
 	return sort2Bytes(leaf, otherLeaf)
@@ -133,5 +133,6 @@ func sortAndHash(i []byte, j []byte) []byte {
 }
 
 func hash(data []byte) []byte {
-	return crypto.Keccak256(data)
+	h := sha3.Sum256(data)
+	return h[:]
 }

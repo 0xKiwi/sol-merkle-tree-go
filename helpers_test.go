@@ -5,32 +5,32 @@ import "testing"
 func Test_nextPowerOf2(t *testing.T) {
 	tests := []struct {
 		name string
-		n uint64
+		n    uint64
 		want uint64
 	}{
 		{
 			name: "0",
-			n: 0,
+			n:    0,
 			want: 0,
 		},
 		{
 			name: "4",
-			n: 4,
+			n:    4,
 			want: 4,
 		},
 		{
 			name: "3",
-			n: 3,
+			n:    3,
 			want: 4,
 		},
 		{
 			name: "8",
-			n: 8,
+			n:    8,
 			want: 8,
 		},
 		{
 			name: "9",
-			n: 9,
+			n:    9,
 			want: 16,
 		},
 	}

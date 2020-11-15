@@ -43,7 +43,6 @@ func padTo(b []byte, size int) []byte {
 
 // Math helpers.
 
-
 func nextPowerOf2(n uint64) uint64 {
 	var count uint64 = 0
 
