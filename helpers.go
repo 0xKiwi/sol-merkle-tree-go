@@ -35,6 +35,17 @@ func safeCopyBytes(cp []byte) []byte {
 	return nil
 }
 
+func copy2dBytes(ary [][]byte) [][]byte {
+	if ary != nil {
+		copied := make([][]byte, len(ary))
+		for i, a := range ary {
+			copied[i] = safeCopyBytes(a)
+		}
+		return copied
+	}
+	return nil
+}
+
 func padTo(b []byte, size int) []byte {
 	if len(b) > size {
 		return b

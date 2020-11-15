@@ -22,7 +22,7 @@ func GenerateTreeFromItems(items [][]byte) (*MerkleTree, error) {
 		return nil, errors.New("no items provided to generate Merkle tree")
 	}
 	// Pad all items to 32 bytes.
-	leaves := items
+	leaves := copy2dBytes(items)
 	for i := range leaves {
 		leaves[i] = padTo(leaves[i], 32)
 	}
