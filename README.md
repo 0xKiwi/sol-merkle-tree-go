@@ -4,6 +4,16 @@ This is a simple merkle tree implementation in go for use within solidity. This 
 
 ## Usage
 ```golang
+import (
+	"encoding/binary"
+	"fmt"
+	"math/big"
+
+	solsha3 "github.com/miguelmota/go-solidity-sha3"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/0xKiwi/sol-merkle-tree-go"
+)
+
 type User struct {
 	index uint64
 	account common.Address
@@ -45,7 +55,7 @@ func createDistributionTree(holderArray []*tokenHolder) (map[string]ClaimInfo, e
     }
     
     // Create the tree.
-    tree, err := solMerkle.GenerateTreeFromItems(nodes)
+    tree, err := solmerkle.GenerateTreeFromItems(nodes)
     if err != nil {
         return nil, fmt.Errorf("could not generate trie: %v", err)
     }
