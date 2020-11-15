@@ -7,7 +7,7 @@ import (
 	"math"
 	"sort"
 
-	"github.com/ethereum/go-ethereum/crypto"
+	solsha3 "github.com/miguelmota/go-solidity-sha3"
 )
 
 // MerkleTree implements a general purpose Merkle tree.
@@ -134,5 +134,17 @@ func SortAndHash(i []byte, j []byte) []byte {
 }
 
 func hash(data ...[]byte) []byte {
-	return crypto.Keccak256(data...)
+	types := make([]string, len(data))
+	for i := 0; i < len(types); i++ {
+		types[i] = "bytes32"
+	}
+	values := make([]interface{}, len(data))
+	for i := 0; i < len(data); i++ {
+		values[i] = solsha3.Bytes32(data[i])
+	}
+	hash := solsha3.SoliditySHA3(
+		types,
+		values,
+	)
+	return hash
 }
