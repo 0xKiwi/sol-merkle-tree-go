@@ -7,7 +7,7 @@ import (
 	"math"
 	"sort"
 
-	"golang.org/x/crypto/sha3"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 // MerkleTree implements a general purpose Merkle tree.
@@ -81,7 +81,7 @@ func (m *MerkleTree) MerkleProof(leaf []byte) ([][]byte, error) {
 		} else {
 			proof[i] = leftLeaf
 		}
-		nextLeaf = hash(append(leftLeaf, rightLeaf...))
+		nextLeaf = hash(leftLeaf, rightLeaf)
 	}
 	return proof, nil
 }
@@ -98,9 +98,9 @@ func VerifyMerkleBranch(root, item []byte, proof [][]byte) bool {
 	node := safeCopyBytes(item)
 	for i := 0; i < len(proof); i++ {
 		if lessThanBytes(node, proof[i]) {
-			node = hash(append(node[:], proof[i]...))
+			node = hash(node[:], proof[i])
 		} else {
-			node = hash(append(proof[i], node[:]...))
+			node = hash(proof[i], node[:])
 		}
 	}
 
@@ -129,10 +129,9 @@ func leafPair(leaves [][]byte, leaf []byte) ([]byte, []byte) {
 
 func sortAndHash(i []byte, j []byte) []byte {
 	sorted1, sorted2 := sort2Bytes(i, j)
-	return hash(append(sorted1, sorted2...))
+	return hash(sorted1, sorted2)
 }
 
-func hash(data []byte) []byte {
-	h := sha3.Sum256(data)
-	return h[:]
+func hash(data ...[]byte) []byte {
+	return crypto.Keccak256(data...)
 }

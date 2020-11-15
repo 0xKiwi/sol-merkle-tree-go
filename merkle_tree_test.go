@@ -90,11 +90,7 @@ func TestGenerateTrieFromItems(t *testing.T) {
 				t.Errorf("GenerateTreeFromItems() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			for i := 0; i < len(got.branches); i++ {
-				for j := 0; j < len(got.branches[i]); j++ {
-					t.Logf("%#x", got.branches[i][j])
-				}
-			}
+
 			root := got.Root()
 			if !bytes.Equal(root, tt.wantRoot) {
 				t.Errorf("root() got = %#x, want %#x", root, tt.wantRoot)
