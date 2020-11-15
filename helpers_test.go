@@ -1,6 +1,8 @@
-package main
+package solmerkle
 
-import "testing"
+import (
+	"testing"
+)
 
 func Test_nextPowerOf2(t *testing.T) {
 	tests := []struct {
