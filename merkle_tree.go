@@ -82,7 +82,10 @@ func (m *MerkleTree) MerkleProof(leaf []byte) ([][]byte, error) {
 	nextLeaf := leaf
 	proof := make([][]byte, m.depth)
 	for i := uint64(0); i < m.depth; i++ {
-		leftLeaf, rightLeaf := leafPair(m.branches[i], nextLeaf)
+		leftLeaf, rightLeaf, err := leafPair(m.branches[i], nextLeaf)
+		if err != nil {
+			return nil, fmt.Errorf("could not find pair: %v", err)
+		}
 		if bytes.Equal(leftLeaf, nextLeaf) {
 			proof[i] = rightLeaf
 		} else {
@@ -114,24 +117,30 @@ func VerifyMerkleBranch(root, item []byte, proof [][]byte) bool {
 	return bytes.Equal(root, node[:])
 }
 
-func leafPair(leaves [][]byte, leaf []byte) ([]byte, []byte) {
+func leafPair(leaves [][]byte, leaf []byte) ([]byte, []byte, error) {
+	var found bool
 	var indexOfLeaf int
 	for i, item := range leaves {
 		if bytes.Equal(item, leaf) {
 			indexOfLeaf = i
+			found = true
 			break
 		}
 	}
+	if !found {
+		return nil, nil, fmt.Errorf("could not find leaf %#x", leaf)
+	}
 
 	var otherLeaf []byte
-	left := indexOfLeaf%2 == 0
-	if left {
+	// Chcek if the leaf is on the left side.
+	if indexOfLeaf%2 == 0 {
 		otherLeaf = safeCopyBytes(leaves[indexOfLeaf+1])
 	} else {
 		otherLeaf = safeCopyBytes(leaves[indexOfLeaf-1])
 	}
+	leftLeaf, rightLeaf := Sort2Bytes(leaf, otherLeaf)
 
-	return Sort2Bytes(leaf, otherLeaf)
+	return leftLeaf, rightLeaf, nil
 }
 
 // SortAndHash sorts the 2 bytes and keccak256 hashes them.

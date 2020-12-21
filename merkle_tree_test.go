@@ -192,12 +192,42 @@ func TestMerkleProof(t *testing.T) {
 				common.Hex2Bytes("1d87197e80d62f8af995d1a8df69efa3996dac57e16757452997f615c0bdcc68"),
 			},
 		},
+		{
+			name: "very large and uneven",
+			items: [][]byte{
+				padTo([]byte{1}, 32),
+				padTo([]byte{4}, 32),
+				padTo([]byte{3}, 32),
+				padTo([]byte{12}, 32),
+				padTo([]byte{12}, 32),
+				padTo([]byte{2}, 32),
+				padTo([]byte{9}, 32),
+				padTo([]byte{16}, 32),
+				padTo([]byte{8}, 32),
+				padTo([]byte{11}, 32),
+				padTo([]byte{12}, 32),
+				padTo([]byte{10}, 32),
+				padTo([]byte{20}, 32),
+				padTo([]byte{100}, 32),
+				padTo([]byte{112}, 32),
+				padTo([]byte{80}, 32),
+				padTo([]byte{32}, 32),
+				padTo([]byte{55}, 32),
+				padTo([]byte{56}, 32),
+				padTo([]byte{120}, 32),
+				padTo([]byte{59}, 32),
+				padTo([]byte{70}, 32),
+				padTo([]byte{60}, 32),
+			},
+			itemToProve: common.Hex2Bytes("beef3c198d933f7462412341b2cc6d0b12215af5adc803ad40dfe5f44a444e0f"),
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := GenerateTreeFromItems(tt.items)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GenerateTreeFromItems() error = %v, wantErr %v", err, tt.wantErr)
+			if err != nil {
+				t.Error(err)
 				return
 			}
 			proof, err := got.MerkleProof(tt.itemToProve)
